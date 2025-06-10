@@ -32,6 +32,7 @@ export interface GPXGenerationOptions {
   // Elevation API options
   addElevation?: boolean; // Add elevation data to GPX
   useRealElevation?: boolean; // Use real elevation API instead of simulated
+  useElevationAdjustedPacing?: boolean; // Adjust speed based on elevation changes
 }
 
 // Default speeds for different activities (km/h)
@@ -66,6 +67,7 @@ export async function generateGpx(options: GPXGenerationOptions): Promise<string
     speedVariation = 0.15,
     addElevation = false,
     useRealElevation = false,
+    useElevationAdjustedPacing = false,
   } = options;
 
   // Calculate speed
@@ -91,7 +93,8 @@ export async function generateGpx(options: GPXGenerationOptions): Promise<string
       speedVariation,
       addElevation: addElevation || elevationGain !== undefined,
       elevationGain,
-      useRealElevation
+      useRealElevation,
+      useElevationAdjustedPacing
     });
   }
 
@@ -614,6 +617,55 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Calculate elevation-adjusted speed based on grade and activity type
+ */
+function calculateElevationAdjustedSpeed(
+  baseSpeedKmh: number,
+  elevationChange: number,
+  distance: number,
+  activityType: 'Run' | 'Bike' | 'Walk' = 'Run'
+): number {
+  if (distance === 0) return baseSpeedKmh;
+
+  // Calculate grade as percentage
+  const grade = (elevationChange / (distance * 1000)) * 100; // Convert km to meters
+
+  // Speed adjustment factors based on activity type and grade
+  let speedMultiplier = 1.0;
+
+  if (activityType === 'Run') {
+    // Running: more sensitive to elevation changes
+    if (grade > 0) {
+      // Uphill: reduce speed significantly
+      speedMultiplier = Math.max(0.4, 1 - (grade * 0.15)); // 15% speed reduction per 1% grade
+    } else if (grade < 0) {
+      // Downhill: increase speed moderately (but not too much for safety)
+      speedMultiplier = Math.min(1.3, 1 + (Math.abs(grade) * 0.08)); // 8% speed increase per 1% downgrade
+    }
+  } else if (activityType === 'Bike') {
+    // Cycling: less sensitive to elevation but still significant
+    if (grade > 0) {
+      // Uphill: reduce speed
+      speedMultiplier = Math.max(0.3, 1 - (grade * 0.12)); // 12% speed reduction per 1% grade
+    } else if (grade < 0) {
+      // Downhill: increase speed more significantly (gravity + aerodynamics)
+      speedMultiplier = Math.min(1.8, 1 + (Math.abs(grade) * 0.15)); // 15% speed increase per 1% downgrade
+    }
+  } else if (activityType === 'Walk') {
+    // Walking: moderate sensitivity
+    if (grade > 0) {
+      // Uphill: reduce speed
+      speedMultiplier = Math.max(0.5, 1 - (grade * 0.10)); // 10% speed reduction per 1% grade
+    } else if (grade < 0) {
+      // Downhill: slight increase (limited by safety)
+      speedMultiplier = Math.min(1.2, 1 + (Math.abs(grade) * 0.05)); // 5% speed increase per 1% downgrade
+    }
+  }
+
+  return baseSpeedKmh * speedMultiplier;
+}
+
 // ============================================================================
 // REALISTIC TIMESTAMP GENERATION WITH HUMAN-LIKE PACING
 // ============================================================================
@@ -627,6 +679,7 @@ interface RealisticTimestampOptions {
   addElevation?: boolean;
   elevationGain?: number;
   useRealElevation?: boolean; // Use real elevation API instead of simulated
+  useElevationAdjustedPacing?: boolean; // Adjust speed based on elevation changes
 }
 
 interface TimestampedPoint {
@@ -659,7 +712,8 @@ export async function generateRealisticTimestamps(
     activityType = 'Run',
     addElevation = false,
     elevationGain = 0,
-    useRealElevation = false
+    useRealElevation = false,
+    useElevationAdjustedPacing = false
   } = options;
 
   if (points.length < 2) {
@@ -717,8 +771,36 @@ export async function generateRealisticTimestamps(
     // Get pacing multiplier for this segment
     const pacingMultiplier = pacingCurve[i];
 
+    // Calculate base speed with pacing curve
+    let baseSpeed = avgSpeedKmh * pacingMultiplier;
+
+    // Apply elevation-adjusted pacing if enabled and elevation data is available
+    if (useElevationAdjustedPacing && addElevation) {
+      const prevElevation = i > 0 && result[i - 1].elevation ? result[i - 1].elevation : 100;
+      let currentElevation: number;
+
+      if (useRealElevation && pointsWithElevation.length > 0) {
+        currentElevation = pointsWithElevation[i]?.ele || prevElevation;
+      } else {
+        const progressRatio = totalDistance / totalRouteDistance;
+        currentElevation = calculateRealisticElevation(
+          cumulativeElevation,
+          progressRatio,
+          elevationGain,
+          totalRouteDistance
+        );
+      }
+
+      const elevationChange = currentElevation - prevElevation;
+      baseSpeed = calculateElevationAdjustedSpeed(
+        baseSpeed,
+        elevationChange,
+        segmentDistance,
+        activityType
+      );
+    }
+
     // Generate realistic speed with variation
-    const baseSpeed = avgSpeedKmh * pacingMultiplier;
     const speedWithVariation = addSpeedVariation(baseSpeed, speedVariation);
 
     // Calculate time for this segment

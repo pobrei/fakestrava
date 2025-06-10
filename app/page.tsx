@@ -1,5 +1,5 @@
 import RouteBuilder from '@/components/RouteBuilder';
-import UnifiedRoutePanel from '@/components/UnifiedRoutePanel';
+import SmartRouteBuilder from '@/components/SmartRouteBuilder';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -49,17 +49,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Interactive Route Builder */}
+        {/* Interactive Map */}
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Interactive Route Builder
+            📍 Interactive Map
           </h2>
+          <p className="text-gray-600 mb-4">
+            Click on the map to create waypoints and build your route. The map will automatically connect points with realistic paths.
+          </p>
           <RouteBuilder />
         </section>
 
-        {/* Unified Route Panel */}
+        {/* Smart Route Builder */}
         <section>
-          <UnifiedRoutePanel />
+          <SmartRouteBuilder />
         </section>
       </main>
     </div>

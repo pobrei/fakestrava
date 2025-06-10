@@ -32,6 +32,9 @@ function FitBounds({ waypoints }: { waypoints: Waypoint[] }) {
   const map = useMap();
 
   useEffect(() => {
+    // Expose map instance globally for city search
+    (window as any).map = map;
+
     if (waypoints.length > 1) {
       const bounds = L.latLngBounds(
         waypoints.map(wp => [wp.lat, wp.lng] as [number, number])
