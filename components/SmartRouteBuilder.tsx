@@ -6,9 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  generateGpx, 
-  downloadGpx, 
+import {
+  downloadGpx,
   GPXGenerationOptions,
   formatDuration,
   formatPace
@@ -31,7 +30,17 @@ interface ActivitySettings {
 export default function SmartRouteBuilder() {
   const { waypoints, routeGeometry, totalDistance, clearWaypoints, setRoutingProfile } = useWaypointStore();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [previewData, setPreviewData] = useState<any>(null);
+  const [previewData, setPreviewData] = useState<{
+    distance: string;
+    duration: string;
+    basePace: string;
+    baseSpeed: string;
+    points: number;
+    realisticFeatures: {
+      elevation: boolean;
+      pacing: boolean;
+    };
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const [settings, setSettings] = useState<ActivitySettings>({
@@ -61,7 +70,7 @@ export default function SmartRouteBuilder() {
     setRoutingProfile(settings.routingProfile);
   }, [settings.routingProfile, setRoutingProfile]);
 
-  const handleSettingChange = (field: keyof ActivitySettings, value: any) => {
+  const handleSettingChange = (field: keyof ActivitySettings, value: string | number | boolean) => {
     setSettings(prev => {
       const newSettings = { ...prev, [field]: value };
       
