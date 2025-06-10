@@ -1,33 +1,34 @@
-# GPX Route Creator
+# 🏃 FakeStrava - Smart Route Builder
 
-A modern web application for creating fake GPX routes for running, cycling, and walking activities. Built with Next.js 14, TypeScript, TailwindCSS, shadcn/ui, and Leaflet maps.
+A powerful web application for creating realistic GPS tracks with real elevation data and intelligent pacing patterns. Generate professional-quality GPX files that are indistinguishable from real fitness tracking data.
 
-## Features
+**🌟 Latest Update**: Complete Smart Route Builder with real elevation integration, city search, and elevation-adjusted pacing!
 
-### Interactive Route Builder (New!)
-- 🗺️ **React Leaflet Integration**: Modern map component with full TypeScript support
-- 📍 **Click-to-Add Waypoints**: Simply click on the map to add waypoints
-- 🎯 **Drag & Drop**: Drag markers to reposition waypoints in real-time
-- 🗑️ **Delete Waypoints**: Click on markers to delete individual waypoints
-- 🛣️ **Road Snapping**: Auto-snap routes to roads using OpenRouteService API
-- 🚗🚴🚶 **Multiple Profiles**: Support for driving, cycling, and walking routes
-- 📏 **Accurate Distance**: Real distance calculation using actual road networks
-- 🎨 **Smart Markers**: Color-coded markers (Green=Start, Red=End, Blue=Waypoint)
-- 🎨 **Route Visualization**: Green lines for road-snapped routes, blue for straight lines
-- 📊 **Live Statistics**: Real-time waypoint count and total distance display
-- 🔄 **State Management**: Powered by Zustand for efficient state handling
-- ⚡ **API Caching**: Intelligent caching to minimize API calls
-- 📥 **GPX Export**: Export your interactive routes as GPX files
+## ✨ Features
 
-### Classic Route Creator
-- 🏃 Create routes for running, cycling, and walking
-- 📍 Click-to-add route points
-- 📏 Real-time distance calculation
-- ⏱️ Estimated activity duration
-- 📁 Save and manage multiple routes
-- 📥 Export routes as GPX files
-- 🎨 Modern UI with shadcn/ui components
-- 📱 Responsive design
+### 🗺️ **Smart Route Builder**
+- **Interactive Map**: Click to create waypoints with visual feedback
+- **City Search**: Search any city worldwide and center the map
+- **Routing Profiles**: Choose between Walking/Running, Cycling, or Driving routes
+- **Real-time Distance**: Live calculation with route optimization
+
+### 🌍 **Real Elevation Data**
+- **Open-Elevation API**: Fetches actual terrain elevation data
+- **Server-side Proxy**: No CORS issues with robust error handling
+- **Automatic Fallback**: Graceful degradation to simulated elevation
+- **Batch Processing**: Efficient API usage with 100-point batches
+
+### ⛰️ **Elevation-Adjusted Pacing**
+- **Running**: 15% slower uphill, 8% faster downhill
+- **Cycling**: 12% slower uphill, 15% faster downhill
+- **Walking**: 10% slower uphill, 5% faster downhill
+- **Grade Calculation**: Precise percentage-based speed adjustments
+
+### 🎯 **Realistic GPX Generation**
+- **Human-like Patterns**: Warmup, peak performance, and fatigue phases
+- **Natural Variations**: Gaussian distribution for realistic GPS data
+- **Activity-specific**: Different behaviors for Run/Bike/Walk
+- **Professional Quality**: Ready for Strava, Garmin Connect, and all fitness apps
 
 ## Tech Stack
 
@@ -88,25 +89,22 @@ pnpm dev
 
 5. Open [http://localhost:3001](http://localhost:3001) in your browser.
 
-## Usage
+## 🎯 How to Use
 
-### Interactive Route Builder
+1. **🔍 Find Location**: Search for any city to start your route
+2. **🗺️ Create Route**: Click on map to add waypoints
+3. **⚙️ Choose Routing**: Select Walking/Cycling/Driving profile
+4. **📝 Configure Activity**: Set name, type, and speed/pace
+5. **🌍 Enable Real Features**: Toggle real elevation and smart pacing
+6. **📊 Preview Route**: See distance, duration, and feature summary
+7. **📥 Generate GPX**: Download realistic file ready for any fitness app
 
-1. **Add Waypoints**: Click anywhere on the map to add waypoints
-2. **Reposition**: Drag any marker to reposition waypoints
-3. **Delete**: Click on a marker and use the delete button in the popup
-4. **View Distance**: Real-time distance calculation appears below the map
-5. **Export**: Use "Export as GPX" to download your route
-6. **Clear**: Use "Clear All Waypoints" to start over
+### Smart Features
 
-### Classic Route Creator
-
-1. **Select Activity Type**: Choose between running, cycling, or walking
-2. **Start Creating**: Click "Start Creating Route" to begin
-3. **Add Points**: Click on the map to add route points
-4. **Name Your Route**: Enter a descriptive name for your route
-5. **Save**: Click "Save Route" when you're satisfied with your route
-6. **Export**: Download your route as a GPX file for use in fitness apps
+- **Real Elevation**: Automatically fetches terrain data for your route
+- **Elevation-Adjusted Pacing**: Realistic speed changes on climbs and descents
+- **Activity-Specific**: Different pacing patterns for Run/Bike/Walk
+- **Human-like Patterns**: Natural speed variations and GPS sampling
 
 ## Project Structure
 
